@@ -1,0 +1,229 @@
+openapi: 3.0.0
+info:
+  title: Donation API
+  description: API pour gérer des dons en ligne
+  version: 1.0.0
+servers:
+- url: http://localhost:8080/api
+  description: Serveur de développement
+paths:
+  /dons:
+    get:
+      summary: Récupérer tous les dons
+      description: Retourne la liste complète de tous les dons
+      operationId: donsGET
+      responses:
+        "200":
+          description: Liste des dons récupérée avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Don"
+                x-content-type: application/json
+        "500":
+          description: Erreur serveur
+      x-swagger-router-controller: Don
+    post:
+      summary: Créer un nouveau don
+      description: Enregistre un nouveau don dans le système
+      operationId: donsPOST
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DonCreate"
+        required: true
+      responses:
+        "201":
+          description: Don créé avec succès
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Don"
+        "400":
+          description: Données invalides
+        "500":
+          description: Erreur serveur
+      x-swagger-router-controller: Don
+  /dons/{id}:
+    get:
+      summary: Récupérer un don par ID
+      description: Retourne les détails d'un don spécifique
+      operationId: donsIdGET
+      parameters:
+      - name: id
+        in: path
+        description: Identifiant unique du don
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+        example: "123456"
+      responses:
+        "200":
+          description: Don trouvé avec succès
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Don"
+        "404":
+          description: Don non trouvé
+        "500":
+          description: Erreur serveur
+      x-swagger-router-controller: Don
+    put:
+      summary: Modifier un don existant
+      description: Met à jour les informations d'un don
+      operationId: donsIdPUT
+      parameters:
+      - name: id
+        in: path
+        description: Identifiant unique du don
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+        example: "123456"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DonCreate"
+        required: true
+      responses:
+        "200":
+          description: Don modifié avec succès
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Don"
+        "400":
+          description: Données invalides
+        "404":
+          description: Don non trouvé
+        "500":
+          description: Erreur serveur
+      x-swagger-router-controller: Don
+    delete:
+      summary: Supprimer un don
+      description: Supprime définitivement un don du système
+      operationId: donsIdDELETE
+      parameters:
+      - name: id
+        in: path
+        description: Identifiant unique du don
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+        example: "123456"
+      responses:
+        "204":
+          description: Don supprimé avec succès
+        "404":
+          description: Don non trouvé
+        "500":
+          description: Erreur serveur
+      x-swagger-router-controller: Don
+components:
+  schemas:
+    Don:
+      required:
+      - categorie
+      - dateCreation
+      - description
+      - donateur
+      - id
+      - valeur
+      type: object
+      properties:
+        id:
+          type: string
+          description: Identifiant unique du don
+          example: "123456"
+        categorie:
+          type: string
+          description: Catégorie du don
+          example: nourriture
+          enum:
+          - nourriture
+          - vêtements
+          - argent
+          - autres
+        description:
+          type: string
+          description: Description détaillée du don
+          example: Boîtes de conserve variées
+        valeur:
+          minimum: 0
+          type: number
+          description: Valeur estimée du don
+          format: float
+          example: 25.5
+        dateCreation:
+          type: string
+          description: Date de création du don
+          format: date
+          example: 2024-01-15
+        donateur:
+          type: string
+          description: Nom ou email du donateur
+          example: jean.dupont@email.com
+      example:
+        dateCreation: 2024-01-15T00:00:00.000+00:00
+        categorie: nourriture
+        valeur: 25.5
+        donateur: jean.dupont@email.com
+        description: Boîtes de conserve variées
+        id: "123456"
+    DonCreate:
+      required:
+      - categorie
+      - description
+      - donateur
+      - valeur
+      type: object
+      properties:
+        categorie:
+          type: string
+          description: Catégorie du don
+          example: nourriture
+          enum:
+          - nourriture
+          - vêtements
+          - argent
+          - autres
+        description:
+          maxLength: 500
+          minLength: 5
+          type: string
+          description: Description détaillée du don
+          example: Boîtes de conserve variées
+        valeur:
+          minimum: 0
+          type: number
+          description: Valeur estimée du don
+          format: float
+          example: 25.5
+        donateur:
+          maxLength: 100
+          minLength: 3
+          type: string
+          description: Nom ou email du donateur
+          example: jean.dupont@email.com
+  parameters:
+    DonId:
+      name: id
+      in: path
+      description: Identifiant unique du don
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+      example: "123456"
